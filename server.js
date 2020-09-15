@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(express.static('./public'));
+app.use(express.static('./data'));
 
 app.get('/', function (req, res) {
   res.send('Whats\'s good, Hollywood?');
