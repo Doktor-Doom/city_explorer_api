@@ -1,46 +1,83 @@
 'use-strict';
-// ===PACKAGE
+// ===PACKAGE===
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+const pg = require('pg');
+const { response } = require('express');
 
-// ===GLOBAL
-const PORT = process.env.PORT;
+// ===GLOBAL===
+const PORT = process.env.PORT || 3003;
 const app = express();
-app.use(cors());
-
-// ===KEYS
+// ===KEYS===
 const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
-
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
-
 const TRAIL_API_KEY = process.env.TRAIL_API_KEY;
-
+const DATABASE_URL = process.env.DATABASE_URL;
 // const YELP_API_KEY = process.env.YELP_API_KEY;
 
 // const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 
+//===EXPRESS CONFIG===
+app.use(cors());
+
+const client = new pg.Client(DATABASE_URL);
+client.on('error', (error) => console.error(error));
 // ===ROUTE
 
 // ===ONE
 app.get('/location', sendLocationData);
 
 function sendLocationData(req, res){
-  const lookFor = req.query.city
-  const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${lookFor}&format=json`;
 
-  superagent.get(urlSearch)
-    .then(someReturned => {
-      const superagentResultArr = someReturned.body;
-      const constLocations = new Location(superagentResultArr);
-      res.send(constLocations);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).send(error.message);
+  const sqlStatement = 'SELECT * FROM locations;';
+  const locationSearch = req.query.city;
+
+  client.query(sqlStatement)
+    .then(sqlResult => {
+      // console.log(sqlResult.rows);
+
+      let existingVal = sqlResult.rows.map(element => element.search_query);
+      if(existingVal.includes(locationSearch)){
+        client.query(`SELECT * FROM locations WHERE search_query = '${locationSearch}'`)
+          .then(storeData => {
+            res.send(storeData.rows[0]);
+          });
+      } else {
+        const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${lookFor}&format=json`;
+
+        superagent.get(urlSearch)
+          .then(resultAPI => {
+
+            const superagentResultArr = resultAPI.body;
+            // console.log(superagentResultArr[0].display_name);
+            const queryString = ('INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1,$2,$3,$4)');
+            const valArr = [locationSearch, superagentResultArr[0].display_name, superagentResultArr[0].lat, superagentResultArr[0].lon];
+            client.query(queryString, valArr)
+              .then( insertData => {
+                res.send(new Location(superagentResultArr));
+              });
+            // const superagentResultArr = someReturned.body;
+            // const constLocations = new Location(superagentResultArr);
+            // res.send(constLocations);
+          })
+          .catch(error => {
+            console.log(error);
+            res.status(500).send(error.message);
+          });
+      }
     });
+
+
+  // const lookFor = req.query.city;
+  
+  // .catch(error => {
+  //   console.log(error);
+  //   res.status(500).send(error.message);
+  // });
+  
 }
 
 // ===TWO
