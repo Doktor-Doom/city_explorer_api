@@ -1,5 +1,41 @@
 # city_explorer_api
-Number and name of feature: ________________________________
+Number and name of feature: Lab6, Set-Up Repo, Deploy Heroku, Create proof of life server back-end, Collecting API Keys 
+
+Estimate of time needed to complete: 4hr
+
+Start time: N/A
+
+Finish time: N/A
+
+Actual time needed to complete: Approx 8-10hr
+
+==================================================
+
+Number and name of feature: 
+
+Estimate of time needed to complete: _____
+
+Start time: _____
+
+Finish time: _____
+
+Actual time needed to complete: _____
+
+===================================================
+
+Number and name of feature: 
+
+Estimate of time needed to complete: _____
+
+Start time: _____
+
+Finish time: _____
+
+Actual time needed to complete: _____
+
+===================================================
+
+Number and name of feature: 
 
 Estimate of time needed to complete: _____
 
@@ -11,10 +47,9 @@ Actual time needed to complete: _____
 
 
 
+# City-Explorer
 
-# Project Name
-
-**Author**: Your Name Goes Here
+**Author**: Andre-Olivier Martin
 **Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview

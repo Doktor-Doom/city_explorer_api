@@ -73,7 +73,7 @@ function sendTrailData(req, res) {
 
   superagent.get(urlToTrails)
     .then(trailData => {
-      console.log(trialData.body);
+      console.log(trailData.body);
       const trailPass = trailData.body.trails;
       const trailArr = trailPass.map(index => new Trail(index));
       res.send(trailArr);
