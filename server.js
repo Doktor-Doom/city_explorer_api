@@ -6,7 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
 const pg = require('pg');
-const { response } = require('express');
+
 
 // ===GLOBAL===
 const PORT = process.env.PORT || 3003;
@@ -31,7 +31,7 @@ client.on('error', (error) => console.error(error));
 app.get('/location', sendLocationData);
 
 function sendLocationData(req, res){
-
+  console.log(req.query);
   const sqlStatement = 'SELECT * FROM locations;';
   const locationSearch = req.query.city;
 
@@ -43,11 +43,12 @@ function sendLocationData(req, res){
       if(existingVal.includes(locationSearch)){
         client.query(`SELECT * FROM locations WHERE search_query = '${locationSearch}'`)
           .then(storeData => {
+            console.log('pulling stuff');
             res.send(storeData.rows[0]);
           });
       } else {
-        const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${lookFor}&format=json`;
-
+        const urlSearch = `https://us1.locationiq.com/v1/search.php?key=${GEOCODE_API_KEY}&q=${locationSearch}&format=json`;
+        console.log(urlSearch);
         superagent.get(urlSearch)
           .then(resultAPI => {
 
@@ -56,8 +57,8 @@ function sendLocationData(req, res){
             const queryString = ('INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1,$2,$3,$4)');
             const valArr = [locationSearch, superagentResultArr[0].display_name, superagentResultArr[0].lat, superagentResultArr[0].lon];
             client.query(queryString, valArr)
-              .then( insertData => {
-                res.send(new Location(superagentResultArr));
+              .then( () => {
+                res.send(new Location(locationSearch, superagentResultArr[0]));
               });
             // const superagentResultArr = someReturned.body;
             // const constLocations = new Location(superagentResultArr);
@@ -123,10 +124,11 @@ function sendTrailData(req, res) {
 }
 // ===EVERYTHING ELSE MAYBE
 
-function Location(jsonObject) {
-  this.formatted_query = jsonObject[0].display_name;
-  this.latitude = jsonObject[0].lat;
-  this.longitude = jsonObject[0].lon;
+function Location(city, jsonObject) {
+  this.search_query = city;
+  this.formatted_query = jsonObject.display_name;
+  this.latitude = jsonObject.lat;
+  this.longitude = jsonObject.lon;
 }
 
 function Weather(jsonObject) {
@@ -149,4 +151,8 @@ function Trail(jsonObject){
 }
 
 //===Start Server
-app.listen(PORT, () => console.log(`listening on PORT : ${PORT}`));
+
+client.connect()
+  .then(() => { app.listen(PORT, () => console.log(`listening on PORT : ${PORT}`));
+  });
+

@@ -11,7 +11,8 @@ Actual time needed to complete: Approx 8-10hr
 
 ==================================================
 
-Number and name of feature: 
+Number and name of feature: Schema.sql 
+removed semicolons 3:30
 
 Estimate of time needed to complete: _____
 
