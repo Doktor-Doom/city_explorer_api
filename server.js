@@ -89,7 +89,6 @@ function sendTrailData(req, res) {
   let latitude = req.query.latitude;
   let longitude = req.query.longitude;
   const urlToTrails = `https://www.hikingproject.com/data/get-trails?&lat=${latitude}&lon=${longitude}&maxDistance=10&key=${TRAIL_API_KEY}`;
-
   superagent.get(urlToTrails)
     .then(trailData => {
       console.log(trailData.body);
