@@ -20,6 +20,7 @@ app.use(cors());
 const client = new pg.Client(DATABASE_URL);
 client.on('error', (error) => console.error(error));
 // ===ROUTE
+app.get('/', (req, res) => res.status(200).send('PINEAPPLE!!!'));
 // ===ONE
 app.get('/location', sendLocationData);
 function sendLocationData(req, res){
